@@ -1,5 +1,7 @@
 # ms-digitalfix-audit (puerto 8085)
 
+[![CI](https://github.com/DigitalFix-Grupo12/ms-digitalfix-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/DigitalFix-Grupo12/ms-digitalfix-audit/actions/workflows/ci.yml)
+
 Timeline de auditoria append-only (JPA + H2).
 
 | Metodo | Ruta | Descripcion |
