@@ -17,6 +17,57 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+  # Cliente Kafka (propiedades comunes). Los deserializadores tipados, el manejo
+  # de errores y la DLT se configuran en messaging.config.KafkaConsumerConfig.
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093,localhost:9094}
+    client-id: ms-digitalfix-audit
+    consumer:
+      group-id: ${digitalfix.kafka.consumer-group}
+      # Grupo nuevo: lee desde el inicio de la retencion (reconstruye el timeline)
+      auto-offset-reset: earliest
+      # El offset lo confirma el contenedor despues de procesar cada registro
+      enable-auto-commit: false
+      isolation-level: read_committed
+      max-poll-records: 50
+      properties:
+        # Rebalanceo incremental: al entrar/salir una instancia no se detiene todo el grupo
+        partition.assignment.strategy: org.apache.kafka.clients.consumer.CooperativeStickyAssignor
+        session.timeout.ms: 15000
+        heartbeat.interval.ms: 5000
+        max.poll.interval.ms: 300000
+        allow.auto.create.topics: false
+    # Productor usado solo para publicar en las DLT
+    producer:
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+        delivery.timeout.ms: 30000
+
+# Nombres y parametros de mensajeria centralizados (sin valores sueltos en el codigo)
+digitalfix:
+  kafka:
+    listeners-enabled: true
+    consumer-group: audit-timeline
+    # = numero de particiones de cada topico: un hilo por particion
+    concurrency: 3
+    topics:
+      workorder-events: workorders.events
+      audit-timeline: audit.timeline
+    # DLT por consumer group: <topico>.<grupo>.DLT (creadas en digitalfix-infra/kafka)
+    dlt-suffix: .DLT
+    retry:
+      max-attempts: 3
+      initial-interval: 1s
+      multiplier: 2.0
+      max-interval: 10s
+
+logging:
+  pattern:
+    # Contexto del evento en cada linea de log (MDC cargado por KafkaLogContext)
+    level: "%5p [evt=%X{eventId:-} trace=%X{traceId:-} %X{topic:-}-%X{partition:-}@%X{offset:-}]"
+
 management:
   endpoints:
     web:

@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** Pruebas de integracion con H2: ingesta y consulta del timeline. */
-@SpringBootTest
+/** Pruebas de integracion con H2: ingesta REST y consulta del timeline (sin broker Kafka). */
+@SpringBootTest(properties = "digitalfix.kafka.listeners-enabled=false")
 @AutoConfigureMockMvc
 class AuditControllerTest {
 

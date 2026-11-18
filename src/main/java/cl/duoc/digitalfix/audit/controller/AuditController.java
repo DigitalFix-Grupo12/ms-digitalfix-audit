@@ -15,8 +15,9 @@ import java.util.List;
  * Timeline de auditoria. API interna (solo la consumen el BFF y los demas
  * microservicios por localhost; el puerto no se expone publicamente).
  *  - GET  /api/audit           -> ultimos N eventos (lectura para el BFF)
- *  - POST /api/audit           -> ingesta de eventos desde otros servicios
- * En la evaluacion de streaming el POST se reemplaza por un consumer Kafka.
+ *  - POST /api/audit           -> ingesta sincrona (canal REST de compatibilidad)
+ * El canal principal de ingesta es Kafka (messaging.listener): workorders.events y
+ * audit.timeline. El POST se mantiene mientras los productores migran a Kafka.
  */
 @RestController
 @RequestMapping("/api/audit")
